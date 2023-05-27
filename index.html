@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Decarbonize!</title>
+    <style>
+      body {background-color: whitesmoke;}
+      </style>
+  </head>
+  <body>
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.152.2/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.152.2/examples/jsm/"
+      }
+    }
+  </script>
+	<script type="module" src="/main.js"></script>
+  <h1>Decarbonize! A game about saving the environment</h1>
+  <h2>Project Overview</h2>
+  <h3>Purpose</h3>
+  <p>
+Events at scale are often difficult to visualise and a key example of this is global warming. While we’ve all heard of sea level rise and the greenhouse effect, it’s very difficult to know what this means for the planet as a whole.
+
+Therefore the aim of this project is to create an interactive simulation of the Earth undergoing global warming. The intent is to create something that can explain some of the fundamentals of global warming in an interactive and easy-to-share format so that anyone can quickly get an intuitive understanding of the topic.
+
+The process of creating this simulation will involve texturing, modelling and animation of a 3D model in order to produce a final model.
+  </p>
+  <h3>Sea level rise and the greenhouse effect</h3>
+  <p>
+The first thing I wanted to model was the greenhouse effect. This occurs when gases in the atmosphere trap infra-red radiation that bounces off the Earth’s surface. This results in continuous warming of the planet. Currently, this effect has been greatly exacerbated by the burning of fossil fuels for energy, leading to a release of CO2 into the atmosphere, which is a very common greenhouse gas. This has led to dangerous climate effects in recent years. This global warming is also is not linear, but rather could be exacerbated by certain “tipping points” which lead to more CO2 and other greenhouse gases being released into the atmosphere.
+The warming of the planet also leads to melting of the ice-caps which then causes a rise in sea-levels. This can increase the likelyhood of floods in low-lying areas and completely submerge certain coastal cities. This is the second main feature that I would like to model on this planet.
+  </p>
+  <h3>Plan</h3>
+  <ol>
+    <li>Rendering a 3D sphere and light source using WebGL</li>
+  </ol>
+  <h2>Implementation</h2>
+WebGL was chosen in order to make the model easy to view and share between people. The three.js library was used to integrate the model into a webpage. The shaders were programmed in GLSL and imported into the final javascript file.
+The wind turbine and powerplant were modeled and textured in blender and then imported into WebGL using the GLTS file format.
+<h3>Texturing</h3>
+<p>
+A Mercator projection map of Earth was downloaded from NASA as a texture and then applied to a sphere using UV coordinates. These coordinates are equivalent to XY coordinates if the sphere was “unwrapped” into a 2D sheet.
+In WebGL, the geometry of a sphere is subdivided into square planes. Therefore each vertex of the sphere corresponds to a point on a virtual grid applied on top of the supplied 2D texture. The colour of the pixels between each vertex is then calculated based on the colour values between grid points on the texture. The colour of each pixel on the texture is therefore “mapped” to a corresponding plane on the sphere and scaled accordingly. This reverses the Mercator projection used to create the 2D map and results in a more accurate 3D globe representation of the Earth.
+</p>
+<img src="/images/BlueMarble.jpg" width="300px" alt="A 2D image of earth">
+<p>
+As the Earth is a 3D object, all 2D maps have undergone distortion in the projection process. Some flaws of the 2D Mercator projection can be seen when mapping back to a sphere. For example Africa is considerably large compared to other continents, however the Mercator projection enlarges areas further from the equator leading to distortion. Therefore a 3D simulation of Earth is much more accurate than a 2D simulation.
+  
+However this model still looks quite flat and does not resemble the actual Earth. One of the goals is to simulate sea level rise, therefore in order to better visualise the ocean a secular map was added to create reflections. This map makes the ocean more reflective than the land, visually indicating the difference between water and land.
+</p>
+<img src="/images/earthspec1k.jpg" width="300px" alt="A 2D black and white image of earth">
+<p>
+This map still lacks topographic detail. This can be added using a displacement map. This runs in the vertex shader and applies a displacement in the direction of the normal vector to each vertex in the mesh based on a given greyscale texture. This has the effect of raising the vertex and changing the geometry of the sphere. The magnitude of the displacement is dependant on the brightness value of a given pixel on the texture. A white pixel would mean maximum displacement whereas a black pixel would mean no displacement. A texture of world topography was used to as a displacement map resulting in the following change.
+</p>
+<img src="/images/bumpmap.jpg" width="300px" alt="A 2D greyscale heightmap of earth">
+<p>
+  As can be seen the Himalayan mountains, the highest point on Earth, has been displaced outward from the sphere, changing the geometry. This can be used to showcase the effects of rising sea levels. By replacing everything below a certain height threshold with a blue texture we can create the illusion of the sea levels rising.
+
+</p>
+
+<p>
+  As can be seen rising sea levels take out parts of the UK and the Netherlands in this simulation, which showcases how the displacement map changes the physical location of vertices. However there is a limit to the amount of detail that can be applied using a displacement map. This limit is due to the computational limitations of WebGL preventing high polygon counts, restricting the number of vertices available to displace. Therefore even with the added topography detail, the earth still appears flat. This is because there is no fine-scale detail. However this detail can be simulated using some clever techniques.
+
+  One such technique is a bumpmap. Similar to a displacement map, this is based on a 2D greyscale texture. However instead of changing the position of vertices in space, it manipulates lighting and shadows to create the illusion of depth at a per-pixel level instead of a per=vertex level. Unlike displacement maps, bumpmaps require a light source to function. If a pixel on the texture is black then light hitting the material behaves as if that pixel is recessed into the geometry. If a pixel on the texture is white, then light reflecting off the material behaves as if those pixels are elevated compared to the rest of the geometry. No resolution is actually added, therefore is often called “fake” detail. This is the simplest way to add detail to a mesh as the bumpmap only records height information.
+</p>
+
+<p>
+The light in this scene is coming from the left. As can be seen the bumpmap makes pixels “facing” the light source brighter, meanwhile pixels on the other side of elevated areas are made darker. This provides the illusion of detailed geometry using simple lighting and darkening. However bumpmaps only store elevation detail, and do not store information about the angle of surfaces leading to a jagged pixellated appearance. For this a normal map can be used.
+A normal map is very similar to a bumpmap in that it creates “fake” detail. However it uses an RGB texture instead of a greyscale one to store extra detail about the slope of various surfaces. The red and blue channels store lighting information when lit from the x and y axes respectively, while the green channel stores lighting information when lit from above. The precise values are evaluated using this set of equations.
+As a result, a normal map can store information about the slope as well as the elevation of a surface. This allows for a smoother transition between pixels while increasing the level of perceived detail on the surface.
+</p>
+
+  <img width="49%" src="images/earth-normalmap.jpg" alt="Normal map of earth">
+  <img width="49%" src="images/earth-normalmap.jpg" alt="Normal map of earth">
+
+<p>
+  This makes the final render look a lot smoother and more realistic compared to using a flat texture or a bumpmap. However this planet still lacks some key features such as an atmosphere. Unfortunately, adding clouds would obscure the surface of the earth which is the main goal of this project. However we can still simulate other atmospheric effects. In particular we can simulate “airglow” which is the light blue shine produced by the atmosphere, due to diffused sunlight and chemical effects.
+This can once again be done using shaders. In order to do this, a second sphere was created, larger than the planet. Then the normal of each vertex was passed to the fragment shader with a normalised magnitude of one. Following this the colour of each pixel was then assigned a blue colour with a power law drop off in intensity as the normals faced further away from the camera.
+</p>
+
+<p>
+  This shader was then applied on top of the globe, using additive blending. Any part that intersected with the globe was removed, in order to only render the outside layer. Finally, some background stars were added to give the planet a place in space. This resulted in the final version of the globe.
+</p>
+
+<h3>Modelling</h3>
+<p>
+  Using blender, a coal fired power plant and a wind turbine were both constructed in blender using mesh primitives and proportional editing of vertices. This involves displacing verticies different amounts from a transformation applied to a specific area. It allows for generation of smooth curves as can be seen in the blades and motor housing of the wind turbine.
+</p>
+
+<p>
+  These materials were then applied to both models. A plain white material was applied to the turbine while the coal fire power plant was given a dark grey material for the base. A striped material was generated for the smokestack by taking the absolute value of a sin-wave texture, applying it to the object coordinates and then mapping the colours to be the colours red and white. A 3D Perlin noise texture was applied to the colour of the coal fired powerplant in order to add more realistic detail. An array modifier was applied to generate the blades of the wind turbine placed 120 degrees apart around a central axis (attached to the motor housing).
+</p>
+
+<p>
+
+</p>
+  <div id="container"></div>
+  </body>
+</html>
