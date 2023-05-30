@@ -60,6 +60,7 @@ var container = document.getElementById('container');
 
 var loader = new THREE.TextureLoader();
 var objLoader = new GLTFLoader();
+//objLoader.setRequestHeader({});
 
 //Scene settings
 var scene = new THREE.Scene();
