@@ -1,9 +1,31 @@
+//Shaders
+
+const fragmentShader =`
+uniform vec4 atmoColor;
+varying vec3 vertexNormal;
+
+    void main(){
+        float intensity = pow(0.9 - dot(vertexNormal, vec3(0.0, 0.0, 1.0)),1.5);
+        gl_FragColor = atmoColor*intensity;
+    }
+
+`
+const vertexShader =`
+
+varying vec3 vertexNormal;
+    void main(){
+        vertexNormal = normalize(normalMatrix*normal);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1);
+    }
+
+`
+
 import * as THREE from "three"
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import vertexShader from "https://raw.githubusercontent.com/Decarbonize/main/shaders/vertexglsl.js"
-import fragmentShader from "https://raw.githubusercontent.com/Decarbonize/main/shaders/fragmentglsl.js"
+//import vertexShader from "https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/shaders/vertexglsl.js"
+//import fragmentShader from "https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/shaders/fragmentglsl.js"
 
 //Initialization
 var lats = [35.6839, 40.6943, 19.4333, 18.9667,-23.5504]
@@ -132,7 +154,7 @@ for (let i = 0; i < 5000; i++) {
 
 starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVerts, 3))
 
-objLoader.load('https://raw.githubusercontent.com/Decarbonize/main/Decarbonize.glb', function ( gltf ) {
+objLoader.load('https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/Decarbonize.glb/',function ( gltf ) {
     const decarb = gltf.scene;
     coal = decarb.children[2];
     wind = decarb.children[1]
@@ -144,7 +166,7 @@ objLoader.load('https://raw.githubusercontent.com/Decarbonize/main/Decarbonize.g
     turbines.forEach(turbine => {
         turbine.visible = false;
     });
-});
+})
 
 function placeOnSphere(object, array) {
     var phi;
@@ -240,14 +262,14 @@ function render() {
     if (params.renewableIndex > 3){
         if (colorOffset > 0.6){
             atmoColor.setHSL(colorOffset, 1.0, 0.65);
-            colorOffset -= 0.00001;
+            colorOffset -= delta/1000;
         }
     }
     else{
 
         if (colorOffset < 0.95){  
             atmoColor.setHSL(colorOffset, 1.0, 0.65);
-            colorOffset += 0.00001;
+            colorOffset += delta/1000;
         }
     }
     
