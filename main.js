@@ -154,7 +154,7 @@ for (let i = 0; i < 5000; i++) {
 
 starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVerts, 3))
 
-objLoader.load('https://cdn.jsdelivr.net/gh/UpsilonAlpha/Decarbonize/Decarbonize.glb',function ( gltf ) {
+objLoader.load('https://cdn.jsdelivr.net/gh/UpsilonAlpha/Decarbonize/raw/decarb.glb',function ( gltf ) {
     const decarb = gltf.scene;
     coal = decarb.children[2];
     wind = decarb.children[1]
