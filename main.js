@@ -26,7 +26,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 //import vertexShader from "https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/shaders/vertexglsl.js"
 //import fragmentShader from "https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/shaders/fragmentglsl.js"
-
+var url = "https://cdn.jsdelivr.net/gh/UpsilonAlpha/Decarbonize/decarb.glb"
+console.log(url)
 //Initialization
 var lats = [35.6839, 40.6943, 19.4333, 18.9667,-23.5504]
 var longs = [139.7744, -73.9249,-99.1333,72.8333,-46.6339]
@@ -60,7 +61,7 @@ var container = document.getElementById('container');
 
 var loader = new THREE.TextureLoader();
 var objLoader = new GLTFLoader();
-
+//objLoader.setRequestHeader({"no-cache"});
 
 //Scene settings
 var scene = new THREE.Scene();
@@ -155,7 +156,8 @@ for (let i = 0; i < 5000; i++) {
 
 starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVerts, 3))
 
-objLoader.load("/decarb.glb",function(gltf) {
+objLoader.load(url,function(gltf) {
+    
     const decarb = gltf.scene;
     coal = decarb.children[2];
     wind = decarb.children[1]
