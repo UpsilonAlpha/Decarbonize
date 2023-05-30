@@ -1,9 +1,11 @@
 import * as THREE from "three"
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import vertexShader from "./shaders/vertex.glsl.js"
-import fragmentShader from "./shaders/fragment.glsl.js"
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import vertexShader from "https://raw.githubusercontent.com/Decarbonize/main/shaders/vertexglsl.js"
+import fragmentShader from "https://raw.githubusercontent.com/Decarbonize/main/shaders/fragmentglsl.js"
 
+//Initialization
 var lats = [35.6839, 40.6943, 19.4333, 18.9667,-23.5504]
 var longs = [139.7744, -73.9249,-99.1333,72.8333,-46.6339]
 var wind;
@@ -12,7 +14,10 @@ var turbines = [];
 var plants = [];
 var coldColor = new THREE.Color(0.3,0.6,1.0);
 var warmColor = new THREE.Color(1.0,0.3,0.6);
+var colorOffset = 0.6;
 var atmoColor = coldColor;
+var degrees = new TextGeometry();
+
 
 const pointer = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
@@ -68,7 +73,7 @@ light.position.set(2, 2, 2);
 //Planet
 var planetMat = new THREE.MeshPhongMaterial();
 
-loader.load('images/BlueMarble.jpg',
+loader.load('https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/cefcb75a3c53e61f8fb905edaa363d1900e1db68/images/BlueMarble.jpg',
     function ( texture ) {
         planetMat.map = texture;
     });
@@ -76,14 +81,15 @@ loader.load('images/BlueMarble.jpg',
 
 planetMat.emissive.set(0x000030)
 
-planetMat.normalMap = loader.load('images/earth-normalmap.jpg');
+planetMat.normalMap = loader.load('https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/images/earth-normalmap.jpg');
 planetMat.normalScale = new THREE.Vector2(4,-4);
 
-planetMat.displacementMap = loader.load('images/bumpmap.jpg');
+planetMat.displacementMap = loader.load('https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/images/bumpmap.jpg');
 planetMat.displacementScale = 0.5;
 
-planetMat.specularMap = loader.load('images/earthspec1k.jpg')
+planetMat.specularMap = loader.load('https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/images/earthspec1k.jpg')
 planetMat.specular = new THREE.Color('#2e2e2e')
+
 
 var planetGeo = new THREE.SphereGeometry(5,100,100);
 var planetMesh = new THREE.Mesh(planetGeo, planetMat)
@@ -106,11 +112,11 @@ var atmoGeo = new THREE.SphereGeometry(5.5, 20, 20)
 var atmoMesh = new THREE.Mesh(atmoGeo, atmoMat)
 
 //Sea
-var seaMat = new THREE.MeshPhongMaterial({color: 0x0c0c2c, blending: THREE.AdditiveBlending})
-
+var seaMat = new THREE.MeshPhongMaterial({color: 0x0000FF, opacity: 0.15})
+seaMat.transparent = true;
 var seaGeo = new THREE.SphereGeometry(5.00005, 100, 100)
 var seaMesh = new THREE.Mesh(seaGeo, seaMat)
-seaMesh.renderOrder = 1
+seaMesh.renderOrder = -1
 
 //Stars
 var starGeometry = new THREE.BufferGeometry();
@@ -126,7 +132,7 @@ for (let i = 0; i < 5000; i++) {
 
 starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVerts, 3))
 
-objLoader.load( 'Decarbonize.glb', function ( gltf ) {
+objLoader.load('https://raw.githubusercontent.com/Decarbonize/main/Decarbonize.glb', function ( gltf ) {
     const decarb = gltf.scene;
     coal = decarb.children[2];
     wind = decarb.children[1]
@@ -139,8 +145,6 @@ objLoader.load( 'Decarbonize.glb', function ( gltf ) {
         turbine.visible = false;
     });
 });
-
-
 
 function placeOnSphere(object, array) {
     var phi;
@@ -158,6 +162,7 @@ function placeOnSphere(object, array) {
     }
     
 }
+
 /*
 var coalMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 5, 5), new THREE.MeshBasicMaterial({color: 0x00FF00}))
 coalMesh.position.setFromSphericalCoords(5, 1, 2)
@@ -188,22 +193,35 @@ window.addEventListener("mousedown", onMouseClick)
 
 var params = new function() { 
     this.sealevel = 1;
+    this.normScale = 1;
+    this.bumpScale = 0;
+    this.renewableIndex = 0;
+    this.timeMoving = true;
     this.atmOn = true;
     this.seaOn = true;
     this.planetOn = true;
-    this.normScale = 1;
-    this.renewableIndex = 0;
+    this.starsOn = true;
+    this.itemsOn = true;
+
 } 
 
 const gui = new dat.GUI();
-gui.add(params,"sealevel", 1, 1.002, 0.00001).name("Sea Level");
+
 gui.add(planetMat,"displacementScale", 0, 3, 0.01).name("Displacement")
 gui.add(params,"renewableIndex", 0, 5).name("Renewables");
-gui.add(params,"normScale", 1, 5, 0.01).name("Normal Map Strength")
-//gui.add(planetMesh.rotation,"y", 0, 10, 0.1).name("Rotation");
+gui.add(params,"normScale", 0, 5, 0.01).name("Normal Map Strength")
+gui.add(params,"bumpScale", 0, 5, 0.01).name("Bump Map Strength")
+gui.add(params,"sealevel", 1, 1.0002, 0.00001).name("Sea Level");
+gui.add(planetMesh.rotation,"y", 0, 10, 0.1).name("Rotation");
+
+gui.add(params,"timeMoving", true, false).name("Time Progression");
 gui.add(params,"atmOn", true, false).name("Atmosphere");
 gui.add(params,"seaOn", true, false).name("Sea");
 gui.add(params,"planetOn", true, false).name("Planet");
+gui.add(params,"starsOn", true, false).name("Stars");
+gui.add(params,"itemsOn", true, false).name("Items");
+
+
 
 
 function render() {
@@ -212,15 +230,43 @@ function render() {
     seaMesh.scale.z = params.sealevel
     atmoMesh.visible = params.atmOn
     seaMesh.visible = params.seaOn
+    stars.visible = params.starsOn
     planetMesh.visible = params.planetOn
-    params.sealevel += delta/1000000;
+    params.sealevel = 1+delta/1000;
     planetMat.normalScale = new THREE.Vector2(4,-4).multiplyScalar(params.normScale)
     light.position.setFromSphericalCoords(20, 30, timeDelta)
-    atmoColor = coldColor.lerp(warmColor, delta/1000);
     atmoMat.uniforms.atmoColor.value = new THREE.Vector4(atmoColor.r,atmoColor.g,atmoColor.b, 1.0)
-    for (let i = 0; i < params.renewableIndex; i++) {
-        turbines[i].visible = true;
-        plants[i].visible = false;
+    //container.innerHTML = `${delta*10}°C`
+    if (params.renewableIndex > 3){
+        if (colorOffset > 0.6){
+            atmoColor.setHSL(colorOffset, 1.0, 0.65);
+            colorOffset -= 0.00001;
+        }
+    }
+    else{
+
+        if (colorOffset < 0.95){  
+            atmoColor.setHSL(colorOffset, 1.0, 0.65);
+            colorOffset += 0.00001;
+        }
+    }
+    
+
+    for (let i = 0; i < turbines.length; i++) {
+        if (params.itemsOn){
+            if (i <= params.renewableIndex){
+                turbines[i].visible = true;
+                plants[i].visible = false;
+            }
+            else{
+                turbines[i].visible = false;
+                plants[i].visible = true;
+            }
+        }
+        else{
+            turbines[i].visible = false;
+            plants[i].visible = false;
+        }
     }
 
     turbines.forEach(turbine => {
@@ -233,18 +279,20 @@ function render() {
 
 function animate(){
     requestAnimationFrame(animate);
-    if (params.renewableIndex > 3)
-    {
-        if (delta > 0.0001)
+    if (params.timeMoving){
+        if (params.renewableIndex > 3)
         {
-            delta -= 0.00002
-        }      
+            if (delta > 0.0001)
+            {
+                delta -= 0.00002
+                
+            }      
+        }
+        
+        delta += 0.00001;
+        console.log(delta)
+        timeDelta += 0.0001;
     }
-
-    delta += 0.00001;
-    console.log(delta)
-    timeDelta += 0.00001;
-    
     render();
 }
 
