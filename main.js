@@ -232,6 +232,8 @@ var params = new function() {
 
 const gui = new dat.GUI();
 
+
+
 gui.add(planetMat,"displacementScale", 0, 3, 0.01).name("Displacement")
 gui.add(params,"renewableIndex", 0, 5).name("Renewables");
 gui.add(params,"normScale", 0, 5, 0.01).name("Normal Map Strength")
@@ -248,7 +250,6 @@ gui.add(params,"itemsOn", true, false).name("Items");
 
 
 
-
 function render() {
     seaMesh.scale.x = params.sealevel
     seaMesh.scale.y = params.sealevel
@@ -262,20 +263,6 @@ function render() {
     light.position.setFromSphericalCoords(20, 30, timeDelta)
     atmoMat.uniforms.atmoColor.value = new THREE.Vector4(atmoColor.r,atmoColor.g,atmoColor.b, 1.0)
     //container.innerHTML = `${delta*10}°C`
-    if (params.renewableIndex > 3){
-        if (colorOffset > 0.6){
-            atmoColor.setHSL(colorOffset, 1.0, 0.65);
-            colorOffset -= delta/1000;
-        }
-    }
-    else{
-
-        if (colorOffset < 0.95){  
-            atmoColor.setHSL(colorOffset, 1.0, 0.65);
-            colorOffset += delta/1000;
-        }
-    }
-    
 
     for (let i = 0; i < turbines.length; i++) {
         if (params.itemsOn){
@@ -311,18 +298,20 @@ function animate(){
             {
                 delta -= 0.00002
                 
-            }      
+            }
+            if (colorOffset > 0.6){
+                colorOffset -= 0.000001;
+            }
         }
-        
+        else{
+    
+            if (colorOffset < 0.95){  
+                colorOffset += 0.000001;
+            }
+        }
+        atmoColor.setHSL(colorOffset, 1.0, 0.65);
         delta += 0.00001;
-        console.log(delta)
         timeDelta += 0.0001;
     }
     render();
 }
-
-
-
-
-
-
