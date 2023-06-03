@@ -97,7 +97,10 @@ This map still lacks topographic detail. This can be added using a displacement 
 <img width="32%" src="images/Earth6.png" alt="Planet with bump map">
 <p>
 The light in this scene is coming from the left. As can be seen the bumpmap makes pixels “facing” the light source brighter, meanwhile pixels on the other side of elevated areas are made darker. This provides the illusion of detailed geometry using simple lighting and darkening. However bumpmaps only store elevation detail, and do not store information about the angle of surfaces leading to a jagged pixellated appearance. For this a normal map can be used<sup><a href="#references">4</a></sup>.
-A normal map is very similar to a bumpmap in that it creates “fake” detail. However it uses an RGB texture instead of a greyscale one to store extra detail about the slope of various surfaces. The red and blue channels store lighting information when lit from the x and y axes respectively, while the green channel stores lighting information when lit from above. The precise values are evaluated using this set of equations.
+A normal map is very similar to a bumpmap in that it creates “fake” detail. However it uses an RGB texture instead of a greyscale one to store extra detail about the slope of various surfaces. The red and blue channels store lighting information when lit from the x and y axes respectively, while the green channel stores lighting information when lit from above. The X and Y channels are typically the most important, which is why normal maps usually appear a light shade of purple. The precise values are evaluated from a bumpmap using this set of differential equations, one for each axis.
+</p>
+<img width="30%" id="center" src="images/normal.png" alt="Normal map equations">
+<p>
 As a result, a normal map can store information about the slope as well as the elevation of a surface. This allows for a smoother transition between pixels while increasing the level of perceived detail on the surface.
 </p>
 <img width="64%" src="https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/images/earth-normalmap.jpg" alt="Normal map of earth">

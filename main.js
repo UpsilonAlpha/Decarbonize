@@ -23,7 +23,6 @@ varying vec3 vertexNormal;
 import * as THREE from "three"
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 //import vertexShader from "https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/shaders/vertexglsl.js"
 //import fragmentShader from "https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/shaders/fragmentglsl.js"
 var url = "https://cdn.jsdelivr.net/gh/UpsilonAlpha/Decarbonize/decarb.glb"
