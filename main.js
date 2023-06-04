@@ -25,7 +25,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 //import vertexShader from "https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/shaders/vertexglsl.js"
 //import fragmentShader from "https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/shaders/fragmentglsl.js"
-var url = "https://cdn.jsdelivr.net/gh/UpsilonAlpha/Decarbonize/decarb.glb"
+var url = "https://cdn.jsdelivr.net/gh/UpsilonAlpha/Decarbonize/decarb.glb?v=1"
 console.log(url)
 //Initialization
 var lats = [35.6839, 40.6943, 19.4333, 18.9667,-23.5504]
