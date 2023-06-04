@@ -38,7 +38,6 @@ var coldColor = new THREE.Color(0.3,0.6,1.0);
 var warmColor = new THREE.Color(1.0,0.3,0.6);
 var colorOffset = 0.6;
 var atmoColor = coldColor;
-var degrees = new TextGeometry();
 
 
 const pointer = new THREE.Vector2();
