@@ -260,6 +260,7 @@ function render() {
     planetMesh.visible = params.planetOn
     params.sealevel = 1+delta/1000;
     planetMat.normalScale = new THREE.Vector2(4,-4).multiplyScalar(params.normScale)
+    planetMat.bumpScale = params.bumpScale;
     light.position.setFromSphericalCoords(20, 30, timeDelta)
     atmoMat.uniforms.atmoColor.value = new THREE.Vector4(atmoColor.r,atmoColor.g,atmoColor.b, 1.0)
     //container.innerHTML = `${delta*10}°C`
