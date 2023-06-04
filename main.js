@@ -105,10 +105,10 @@ planetMat.emissive.set(0x000030)
 
 planetMat.normalMap = loader.load('https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/images/earth-normalmap.jpg');
 planetMat.normalScale = new THREE.Vector2(4,-4);
-
+/*
 planetMat.bumpMap = loader.load('https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/images/bumpmap.jpg');
 planetMat.bumpScale = 0;
-
+*/
 planetMat.displacementMap = loader.load('https://raw.githubusercontent.com/UpsilonAlpha/Decarbonize/main/images/bumpmap.jpg');
 planetMat.displacementScale = 0.5;
 
@@ -220,7 +220,7 @@ window.addEventListener("mousedown", onMouseClick)
 var params = new function() { 
     this.sealevel = 1;
     this.normScale = 1;
-    this.bumpScale = 0;
+    //this.bumpScale = 0;
     this.renewableIndex = 0;
     this.timeMoving = true;
     this.atmOn = true;
@@ -238,7 +238,7 @@ const gui = new dat.GUI();
 gui.add(planetMat,"displacementScale", 0, 3, 0.01).name("Displacement")
 gui.add(params,"renewableIndex", 0, 5).name("Renewables");
 gui.add(params,"normScale", 0, 5, 0.01).name("Normal Map Strength")
-gui.add(params,"bumpScale", 0, 5, 0.01).name("Bump Map Strength")
+//gui.add(params,"bumpScale", 0, 5, 0.01).name("Bump Map Strength")
 gui.add(planetMesh.rotation,"y", 0, 10, 0.1).name("Rotation");
 
 gui.add(params,"timeMoving", true, false).name("Time Progression");
@@ -260,7 +260,7 @@ function render() {
     planetMesh.visible = params.planetOn
     params.sealevel = 1+delta/1000;
     planetMat.normalScale = new THREE.Vector2(4,-4).multiplyScalar(params.normScale)
-    planetMat.bumpScale = params.bumpScale;
+    //planetMat.bumpScale = params.bumpScale;
     light.position.setFromSphericalCoords(20, 30, timeDelta)
     atmoMat.uniforms.atmoColor.value = new THREE.Vector4(atmoColor.r,atmoColor.g,atmoColor.b, 1.0)
     //container.innerHTML = `${delta*10}°C`
